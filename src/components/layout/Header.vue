@@ -1,9 +1,11 @@
 <template>
 	<header class="header">
-		<h1>Todo List</h1>
+		<h1>Aerospacelab Demo</h1>
 		<div id="nav">
 			<router-link to="/">Home</router-link>
 			<router-link to="/about">About</router-link>
+			<router-link to="/postsmanager">PostsManager</router-link>
+			<router-link to="/gmap">Map</router-link>
 		</div>
 	</header>
 </template>
