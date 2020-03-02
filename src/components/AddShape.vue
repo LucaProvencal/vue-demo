@@ -8,8 +8,6 @@
 	</div>
 </template>
 
-
-
 <script>
 export default{
 	name: "AddShape",
@@ -34,8 +32,6 @@ export default{
 	}
 }
 </script>
-
-
 
 <style scoped> 
   form {

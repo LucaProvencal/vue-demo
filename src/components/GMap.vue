@@ -1,17 +1,13 @@
 <template>
   <div>
     <Home />
-
     <div class="lines" >
       <svg style="width: 1000px; height: 600px;">
         <line :key="m.key" :id="m" v-for="m in lines" :x1="m.x1" :y1="m.y1" :x2="m.x2" :y2="m.y2" style="stroke:rgb(255,0,0);stroke-width:2"/>
       </svg>
     </div>
-
-  <!-- <h1 style="position: absolute;"> Polygon </h1> -->
-
     <div  style="position: absolute; z-index: -1">
-      <GmapMap style="width: 1000px; height: 600px;" :zoom="1" @zoom_changed="zoomed" :center="{lat: 0, lng: 0}" @center_changed="dragged"
+      <GmapMap :options="{fullscreenControl: false}" style="width: 1000px; height: 600px;" :zoom="1" @zoom_changed="zoomed" :center="{lat: 0, lng: 0}" @center_changed="dragged"
           ref="map" @click="clicked">
          <GmapMarker
             :key="m.key"
@@ -23,26 +19,21 @@
           />
       </GmapMap>
     </div>
-    
- <!--  <button @click="clear" class="del">Clear Points</button> -->
-
-  
   </div>
 </template>
 
 <script>
 import { gmapApi } from "vue2-google-maps";
 import { Home } from "../views/Home.vue";
-// import {range} from 'lodash';
 
 export default {
   name: "GMap",
-  props: {  // I was initially using this as setState. need to put any initial vals in data(). accepted prop types defined here
+  props: {  // I was initially using this as setState. need to put any initial vals in data(). accepted prop types defined here. React transition
     selected: Number,         // indicates which shape to edit
     shown: Array,             // indicates which shapes are shown
     numberOfShapes: Number    // total number of shapes
   },
-  watch: {        // runs when props is changed.
+  watch: {        // runs when props are changed.
     selected: function(newVal, oldVal) { // watch it
       console.log('Prop changed: ', newVal, ' | was: ', oldVal)
 
@@ -75,8 +66,6 @@ export default {
   methods: {
     clicked (e) {
 
-
-        console.log(this.selected)
         this.lat = e.latLng.lat() // pulls latitude from click
         this.lng = e.latLng.lng() // pulls longitude from click
 
@@ -96,9 +85,7 @@ export default {
 
     },
     dragged (e) {  // it jumps at the end due to google maps "momentum" rendering. i.e. map keeps moving after you let go of drag, despite calculating the endpoints right as you let go. 
-      // console.log(e)
-      // console.log(e.lat())
-      // console.log(e.lng())
+
       this.center = {
         lat: e.lat,
         lng: e.lng
@@ -106,7 +93,7 @@ export default {
       this.lines = []
       this.createLines(this.points, this.zoom, this.center) // When dragged (center changed), read current zoom and current center. create lines with current point and current center. 
 
-      this.allLines[this.selected] = this.lines // only updates current lines. need to update all l
+      this.allLines[this.selected] = this.lines // only updates current lines. need to update all lines
     },
     zoomed (e) {
       this.zoom = e
@@ -117,11 +104,6 @@ export default {
     },
     
     markerDragged(e, key) {   // if user drags marker, need to update this.points and re-draw lines. 
-      // console.log(e)
-      // console.log(key)
-      // console.log(e.latLng)
-      // console.log(this.points[key])
-
 
       this.points[key] = {"lat": e.latLng.lat(), "lng": e.latLng.lng(), "key": key}
       this.lines = []
@@ -138,7 +120,7 @@ export default {
       // https://developers.google.com/maps/documentation/javascript/coordinates
       // https://stackoverflow.com/questions/14329691/convert-latitude-longitude-point-to-a-pixels-x-y-on-mercator-projection
      
-      let zoomFactor = Math.pow(2, zoom - 1)
+      let zoomFactor = Math.pow(2, zoom - 1)          // used to incorporate scaling and offset due to user zooming/dragging
       let offsetRadians = (center.lat())*Math.PI/180;
       let offsetmercN = Math.log(Math.tan((Math.PI/4)+(offsetRadians/2)));
 
@@ -146,11 +128,11 @@ export default {
       if (points.length == 1) {
         this.lines = []
         return this.lines
-      } else if (points.length == 2) {
+      } else if (points.length == 2) {    // if a line between two points needs to be drawn.
 
-        let latRadians1 = (points[0].lat)*Math.PI/180;
-        let mercN1 = Math.log(Math.tan((Math.PI/4)+(latRadians1/2)));
-        let summercN1 = mercN1 - offsetmercN;
+        let latRadians1 = (points[0].lat)*Math.PI/180;                 // converting lat/lng to mercator projection xy. 
+        let mercN1 = Math.log(Math.tan((Math.PI/4)+(latRadians1/2)));  // the 
+        let summercN1 = mercN1 - offsetmercN;                          // this line accounts for the XY offset due to dragging 
 
         let latRadians2 = (points[1].lat)*Math.PI/180;
         let mercN2 = Math.log(Math.tan((Math.PI/4)+(latRadians2/2)));
@@ -159,17 +141,17 @@ export default {
         this.lines = [
             { 
               "x1": (512*(180+(points[0].lng - center.lng()) * zoomFactor)/360) + 244,   
-              "y1": (512/2)-(512*summercN1/(2*Math.PI) * zoomFactor) + 43,    // 23 is the y height offset
-              "x2": (512*(180+(points[1].lng - center.lng()) * zoomFactor)/360) + 244,
+              "y1": (512/2)-(512*summercN1/(2*Math.PI) * zoomFactor) + 43,     // last terms are XY height offset in absolute position
+              "x2": (512*(180+(points[1].lng - center.lng()) * zoomFactor)/360) + 244,  // zoomfactor accounts for zooming the map. applied to all coords.
               "y2": (512/2)-(512*summercN2/(2*Math.PI) * zoomFactor) + 43,
               "key": 0
             }
         ]
         return this.lines
       } else {
-        for(let i=0; i<points.length; i++) {
-          let point1 = i%points.length;
-          let point2 = (i+1)%points.length;
+        for(let i=0; i<points.length; i++) {    // if a polygon needs to be made. this will connect 3 or more lines in the order they were created
+          let point1 = i%points.length;   
+          let point2 = (i+1)%points.length; // if point1 is the last point picked, make point2 the first point that was picked
 
           let latRadians1 = points[point1].lat*Math.PI/180;
           let mercN1 = Math.log(Math.tan((Math.PI/4)+(latRadians1/2)));

@@ -1,12 +1,8 @@
 <template>
-	<div :class="{'shape-item-selected' : this.activeShape == shape.id, 'shape-item-not-selected' : this.activeShape != shape.id}"  @click="updateActiveShape">
-		<!-- <div v-if="this.activeShape == shape.id"> Selected </div> -->
-    
+	<div :class="{'shape-item-selected' : this.activeShape == shape.id, 'shape-item-not-selected' : this.activeShape != shape.id}"  @click="updateActiveShape">    
     <p>
-      <!-- {{shape.id}}. -->
-			Layer Name: {{shape.title}}
+			Shape Name: {{shape.title}}
 			<button @click="$emit('del-shape', shape.id)" class="del">delete</button>
-
 		</p>
 	</div>
 </template>
@@ -21,9 +17,6 @@ export default {
 		},
     updateActiveShape() {
       this.$emit('onUpdateShape', this.shape.id)
-
-      // console.log(this.activeShape)
-      // console.log(this.shape.id)
     }
 	}
 }
