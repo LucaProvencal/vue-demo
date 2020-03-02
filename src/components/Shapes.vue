@@ -9,6 +9,7 @@
 <script>
 import ShapeItem from "./ShapeItem"
 
+
 export default {
 	name: "Shapes",
 	props: ["shapes", "activeShape"],
