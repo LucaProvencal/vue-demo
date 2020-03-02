@@ -1,13 +1,14 @@
 <template>
   <div>
+    <Home />
 
-    <div class="lines">
+    <div class="lines" >
       <svg style="width: 1000px; height: 600px;">
-        <line :key="m.key" :id="m" v-for="m in lineArray" :x1="m.x1" :y1="m.y1" :x2="m.x2" :y2="m.y2" style="stroke:rgb(255,0,0);stroke-width:2"/>
+        <line :key="m.key" :id="m" v-for="m in lines" :x1="m.x1" :y1="m.y1" :x2="m.x2" :y2="m.y2" style="stroke:rgb(255,0,0);stroke-width:2"/>
       </svg>
     </div>
 
-  <h1 style="position: absolute;"> Polygon </h1>
+  <!-- <h1 style="position: absolute;"> Polygon </h1> -->
 
     <div  style="position: absolute; z-index: -1">
       <GmapMap style="width: 1000px; height: 600px;" :zoom="1" @zoom_changed="zoomed" :center="{lat: 0, lng: 0}" @center_changed="dragged"
@@ -18,28 +19,39 @@
             :position="{lat: m.lat, lng: m.lng}"
             :clickable="true"
             :draggable="true"
-            @click="center=m.position"
             @drag="markerDragged($event, m.key)"
           />
       </GmapMap>
     </div>
     
-  <button @click="clear" class="del">Clear Points</button>
+ <!--  <button @click="clear" class="del">Clear Points</button> -->
 
-
+  
   </div>
 </template>
 
 <script>
 import { gmapApi } from "vue2-google-maps";
+import { Home } from "../views/Home.vue";
 // import {range} from 'lodash';
 
 export default {
   name: "GMap",
   props: {  // I was initially using this as setState. need to put any initial vals in data(). accepted prop types defined here
+    selected: Number,         // indicates which shape to edit
+    shown: Array,             // indicates which shapes are shown
+    numberOfShapes: Number    // total number of shapes
+  },
+  watch: {        // runs when props is changed.
+    selected: function(newVal, oldVal) { // watch it
+      console.log('Prop changed: ', newVal, ' | was: ', oldVal)
+
+      this.lines= this.allLines[newVal]
+      this.points= this.allPoints[newVal]
+    }
   },
   data() {    // this is like setstate in constructor in React. gives initial values for this.zoom and this.center
-    return{ 
+    return { 
       zoom: 1,
       center: { 
         lat: () => 0, 
@@ -48,11 +60,14 @@ export default {
       lat: 0,
       lng: 0,
       points: [],
-      lineArray: []
+      allPoints: [],
+      lines: [],
+      allLines: []
     }
   },
   components: {
-    //GmapMap // couldnt get this to register. receiving warning
+    //GmapMap, // couldnt get this to register. receiving warning
+    Home
   },
   computed: {
     google: gmapApi
@@ -61,6 +76,7 @@ export default {
     clicked (e) {
 
 
+        console.log(this.selected)
         this.lat = e.latLng.lat() // pulls latitude from click
         this.lng = e.latLng.lng() // pulls longitude from click
 
@@ -70,9 +86,13 @@ export default {
           this.points = [...this.points, {"lat": this.lat, "lng": this.lng, "key": this.points.length}]
         }
 
+        this.lines = [] // removes leftover lines. without it, would create a new polygon for every point added.
+        this.allPoints[this.selected] = this.points
 
-        this.lineArray = [] // removes leftover lines. without it, would create a new polygon for every point added.
-        this.createLines(this.points, this.zoom, this.center) // When adding new points, read current zoom and current center. create lines with current point and current center. 
+        this.createLines(this.allPoints[this.selected], this.zoom, this.center, this.selected) // When adding new points, read current zoom and current center. create lines with current point and current center. 
+
+        
+        this.allLines[this.selected] = this.lines
 
     },
     dragged (e) {  // it jumps at the end due to google maps "momentum" rendering. i.e. map keeps moving after you let go of drag, despite calculating the endpoints right as you let go. 
@@ -83,13 +103,17 @@ export default {
         lat: e.lat,
         lng: e.lng
       }
-      this.lineArray = []
+      this.lines = []
       this.createLines(this.points, this.zoom, this.center) // When dragged (center changed), read current zoom and current center. create lines with current point and current center. 
+
+      this.allLines[this.selected] = this.lines // only updates current lines. need to update all l
     },
     zoomed (e) {
       this.zoom = e
-      this.lineArray = []
+      this.lines = []
       this.createLines(this.points, this.zoom, this.center)
+
+      this.allLines[this.selected] = this.lines
     },
     
     markerDragged(e, key) {   // if user drags marker, need to update this.points and re-draw lines. 
@@ -100,14 +124,15 @@ export default {
 
 
       this.points[key] = {"lat": e.latLng.lat(), "lng": e.latLng.lng(), "key": key}
-      this.lineArray = []
+      this.lines = []
       this.createLines(this.points, this.zoom, this.center)
 
+      this.allLines[this.selected] = this.lines
     },
 
-    createLines(points, zoom = 1, center = { lat: () => 0, lng: () => 0 }) { // passing default zoom and center in. center vars are functions. needed to pass in default funcs within object
+    createLines(points, zoom = 1, center = { lat: () => 0, lng: () => 0 }, selected) { // passing default zoom and center in. center vars are functions. needed to pass in default funcs within object
 
-      // console.log(center)
+      console.log(selected)
       
       // References:
       // https://developers.google.com/maps/documentation/javascript/coordinates
@@ -119,8 +144,8 @@ export default {
 
 
       if (points.length == 1) {
-        this.lineArray = []
-        return this.lineArray
+        this.lines = []
+        return this.lines
       } else if (points.length == 2) {
 
         let latRadians1 = (points[0].lat)*Math.PI/180;
@@ -131,16 +156,16 @@ export default {
         let mercN2 = Math.log(Math.tan((Math.PI/4)+(latRadians2/2)));
         let summercN2 = mercN2 - offsetmercN;
 
-        this.lineArray = [
+        this.lines = [
             { 
               "x1": (512*(180+(points[0].lng - center.lng()) * zoomFactor)/360) + 244,   
-              "y1": (512/2)-(512*summercN1/(2*Math.PI) * zoomFactor) + 44,
+              "y1": (512/2)-(512*summercN1/(2*Math.PI) * zoomFactor) + 43,    // 23 is the y height offset
               "x2": (512*(180+(points[1].lng - center.lng()) * zoomFactor)/360) + 244,
-              "y2": (512/2)-(512*summercN2/(2*Math.PI) * zoomFactor) + 44,
+              "y2": (512/2)-(512*summercN2/(2*Math.PI) * zoomFactor) + 43,
               "key": 0
             }
         ]
-        return this.lineArray
+        return this.lines
       } else {
         for(let i=0; i<points.length; i++) {
           let point1 = i%points.length;
@@ -149,16 +174,16 @@ export default {
           let latRadians1 = points[point1].lat*Math.PI/180;
           let mercN1 = Math.log(Math.tan((Math.PI/4)+(latRadians1/2)));
           let summercN1 = (mercN1 - offsetmercN) * zoomFactor;
-          let y1 = (512/2)-(512*summercN1/(2*Math.PI)) + 44;
+          let y1 = (512/2)-(512*summercN1/(2*Math.PI)) + 43;
           let x1 = 512*(180+(points[point1].lng - center.lng()%360) * zoomFactor)/360 + 244;  
           
           let latRadians2 = points[point2].lat*Math.PI/180;
           let mercN2 = Math.log(Math.tan((Math.PI/4)+(latRadians2/2)));
           let summercN2 = (mercN2 - offsetmercN) * zoomFactor;
-          let y2 = (512/2)-(512*summercN2/(2*Math.PI)) + 44;
+          let y2 = (512/2)-(512*summercN2/(2*Math.PI)) + 43;
           let x2 = 512*(180+(points[point2].lng - center.lng()%360) * zoomFactor)/360 + 244;
 
-          this.lineArray = [...this.lineArray,
+          this.lines = [...this.lines,
             { 
               "x1": x1,   
               "y1": y1,
@@ -169,11 +194,11 @@ export default {
           ]
         }
 
-        return this.lineArray
+        return this.lines
       }
     },
     clear() {
-      this.lineArray = []
+      this.lines = []
       this.points = []
     }
   }
@@ -184,7 +209,7 @@ export default {
 
 .lines {
   position: absolute;
-  top:146px;
+  top:157px;
   width:1000;
   height:600;
   z-index: 10000;

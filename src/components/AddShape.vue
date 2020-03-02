@@ -1,7 +1,8 @@
 <template>
 	<div>
-		<form @submit="addTodo">
-			<input type="text" v-model="title" name= "title" placeholder="Add Todo...">
+		<h1 style="position: absolute; top: -67px; left:0px; width: 400px">Polygon Overlay</h1>
+		<form @submit="addShape" style="position: absolute; top: 5px; left:0px;">
+			<input type="text" v-model="title" name= "title" placeholder="Add a Shape...">
 			<input type="submit" value="Submit" class="btn">
 		</form>
 	</div>
@@ -11,7 +12,7 @@
 
 <script>
 export default{
-	name: "AddTodo",
+	name: "AddShape",
 	data() {
 		return {
 			title: ''
@@ -19,15 +20,14 @@ export default{
 	},
 
 	methods: {
-		addTodo(e) {
+		addShape(e) {
 			e.preventDefault();
-			const newTodo = {
-				title: this.title,
-				completed: false
+			const newShape = {
+				title: this.title
 			}
 			//send up to parent
 
-			this.$emit('add-todo', newTodo);
+			this.$emit('add-shape', newShape);
 
 			this.title = '';
 		}
@@ -44,6 +44,7 @@ export default{
   input[type="text"] {
     flex: 10;
     padding: 5px;
+    width: 300px;
   }
   input[type="submit"] {
     flex: 2;

@@ -4,8 +4,8 @@
 		<div id="nav">
 			<router-link to="/">Home</router-link>
 			<router-link to="/about">About</router-link>
-			<router-link to="/postsmanager">PostsManager</router-link>
-			<router-link to="/gmap">Map</router-link>
+	<!-- 		<router-link to="/postsmanager">PostsManager</router-link> -->
+
 		</div>
 	</header>
 </template>

@@ -21,19 +21,19 @@ export default {
       return req.data
     })
   },
-  getPosts () {
-    return this.execute('get', '/posts')
+  getShapes () {
+    return this.execute('get', '/shapes')
   },
-  getPost (id) {
-    return this.execute('get', `/posts/${id}`)
+  getShape (id) {
+    return this.execute('get', `/shapes/${id}`)
   },
-  createPost (data) {
-    return this.execute('post', '/posts', data)
+  createShape (data) {
+    return this.execute('post', '/shapes', data)
   },
-  updatePost (id, data) {
-    return this.execute('put', `/posts/${id}`, data)
+  updateShape (id, data) {
+    return this.execute('put', `/shapes/${id}`, data)
   },
-  deletePost (id) {
-    return this.execute('delete', `/posts/${id}`)
+  deleteShape (id) {
+    return this.execute('delete', `/shapes/${id}`)
   }
 }
