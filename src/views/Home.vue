@@ -50,10 +50,9 @@ export default {
   },
 
   //componentDidMount analog. fires when component is created
-  async created() { 
-    this.refreshShapes()
-    // return this.shapes = DefaultShapes
-  },
+  // async created() { 
+  //   // return this.shapes = DefaultShapes
+  // },
 
   data() {
     return {
