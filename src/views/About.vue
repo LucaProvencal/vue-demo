@@ -2,7 +2,7 @@
 	<div class="about">
 	<h1>Demo Vue App Using Google Maps API</h1>
 	<h4>Author: Luca Provencal</h4>	
-	<p>repo: <a href="https://github.com/LucaProvencal/vue_aerospacelab_demo " >https://github.com/LucaProvencal/vue_aerospacelab_demo</a><br/></p>	
+	<p>repo: <a href="https://github.com/LucaProvencal/vue-demo" >https://github.com/LucaProvencal/vue-demo</a><br/></p>	
 
 	<h4>References:</h4>
     <p>
