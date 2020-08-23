@@ -1,6 +1,5 @@
 <template>
   <div>
-    <Home />
     <div class="lines" >
       <svg style="width: 1000px; height: 600px;">
         <line :key="m.key" :id="m" v-for="m in lines" :x1="m.x1" :y1="m.y1" :x2="m.x2" :y2="m.y2" style="stroke:rgb(255,0,0);stroke-width:2"/>
@@ -24,7 +23,6 @@
 
 <script>
 import { gmapApi } from "vue2-google-maps";
-import { Home } from "../views/Home.vue";
 import Vue from 'vue'
 import * as VueGoogleMaps from 'vue2-google-maps'
 
@@ -73,7 +71,7 @@ export default {
   },
   components: {
     //GmapMap, // couldnt get this to register. receiving warning
-    Home
+    
   },
   computed: {
     google: gmapApi
