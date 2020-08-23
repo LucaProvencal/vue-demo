@@ -1,3 +1,3 @@
-# vue_aerospacelab_demo
+# Vue Demo - Maps
 
 Demo application highlighting Polygon overlaying over Google Maps API.

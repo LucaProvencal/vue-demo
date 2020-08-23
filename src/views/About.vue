@@ -1,6 +1,6 @@
 <template>
 	<div class="about">
-	<h1>Demo Vue App for Aerospacelab</h1>
+	<h1>Demo Vue App Using Google Maps API</h1>
 	<h4>Author: Luca Provencal</h4>	
 	<p>repo: <a href="https://github.com/LucaProvencal/vue_aerospacelab_demo " >https://github.com/LucaProvencal/vue_aerospacelab_demo</a><br/></p>	
 

@@ -9,7 +9,6 @@
 		</h5>
 		<br/>
 		<br/>
-		<h3>If map does not render, please switch to About tab and back. Working on this. </h3>
 	</div>
 </template>
 

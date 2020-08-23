@@ -1,6 +1,6 @@
 <template>
 	<header class="header">
-		<h1>Aerospacelab Demo</h1>
+		<h1>Vue Demo - Maps</h1>
 		<div id="nav">
 			<router-link to="/">App</router-link>
 			<router-link to="/about">About</router-link>

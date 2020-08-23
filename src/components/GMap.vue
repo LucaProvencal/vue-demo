@@ -6,9 +6,9 @@
         <line :key="m.key" :id="m" v-for="m in lines" :x1="m.x1" :y1="m.y1" :x2="m.x2" :y2="m.y2" style="stroke:rgb(255,0,0);stroke-width:2"/>
       </svg>
     </div>
-    <div  style="position: absolute; z-index: -1">
-      <GmapMap :options="{fullscreenControl: false}" style="width: 1000px; height: 600px;" :zoom="1" @zoom_changed="zoomed" :center="{lat: 0, lng: 0}" @center_changed="dragged"
-          ref="map" @click="clicked">
+    <div  style="position: absolute; z-index: -1; width: 1000px; height: 600px;">
+      <GmapMap :options="{fullscreenControl: false}" ref="mapRef" style="width: 1000px; height: 600px;" :zoom="1" @zoom_changed="zoomed" :center="{lat: 0, lng: 0}" @center_changed="dragged"
+           @click="clicked">
          <GmapMarker
             :key="m.key"
             v-for="m in points"
@@ -25,6 +25,16 @@
 <script>
 import { gmapApi } from "vue2-google-maps";
 import { Home } from "../views/Home.vue";
+import Vue from 'vue'
+import * as VueGoogleMaps from 'vue2-google-maps'
+
+// this connects to google maps API. I initially had this in my main.js, causing problems initializing the map.
+Vue.use(VueGoogleMaps, {
+  load: {
+    key: process.env.VUE_APP_MAPS_KEY,
+    libraries: 'places', 
+  }
+})
 
 export default {
   name: "GMap",
@@ -40,6 +50,11 @@ export default {
       this.lines= this.allLines[newVal]
       this.points= this.allPoints[newVal]
     }
+  },
+   mounted() {    
+
+    
+  
   },
   data() {    // this is like setstate in constructor in React. gives initial values for this.zoom and this.center
     return { 
@@ -131,7 +146,7 @@ export default {
       } else if (points.length == 2) {    // if a line between two points needs to be drawn.
 
         let latRadians1 = (points[0].lat)*Math.PI/180;                 // converting lat/lng to mercator projection xy. 
-        let mercN1 = Math.log(Math.tan((Math.PI/4)+(latRadians1/2)));  // the 
+        let mercN1 = Math.log(Math.tan((Math.PI/4)+(latRadians1/2)));  
         let summercN1 = mercN1 - offsetmercN;                          // this line accounts for the XY offset due to dragging 
 
         let latRadians2 = (points[1].lat)*Math.PI/180;
