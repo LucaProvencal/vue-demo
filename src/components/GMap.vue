@@ -143,7 +143,7 @@ export default {
       if (points.length == 1) {
         this.lines = []
         return this.lines
-      } else if (points.length == 2) {    // if a line between two points needs to be drawn.
+      } else if (points.length == 2) {    // if a line between two points needs to be drawn. 
 
         let latRadians1 = (points[0].lat)*Math.PI/180;                 // converting lat/lng to mercator projection xy. 
         let mercN1 = Math.log(Math.tan((Math.PI/4)+(latRadians1/2)));  
@@ -168,6 +168,12 @@ export default {
           let point1 = i%points.length;   
           let point2 = (i+1)%points.length; // if point1 is the last point picked, make point2 the first point that was picked
 
+          /*  lat and lng are received from Maps API in degrees. Here, they are converted to XY outputs associated with 
+              corresponding overlay location on top of a Mercator projection. I initially tried to just convert lat/lng
+              to XY, quickly realized there was a nonlinear relationship, and discovered google maps uses the Mercator 
+              projection. Then equations of the projection are used to convert to XY coordinates in order to plot the lines.
+          */
+
           let latRadians1 = points[point1].lat*Math.PI/180;
           let mercN1 = Math.log(Math.tan((Math.PI/4)+(latRadians1/2)));
           let summercN1 = (mercN1 - offsetmercN) * zoomFactor;
@@ -180,6 +186,7 @@ export default {
           let y2 = (512/2)-(512*summercN2/(2*Math.PI)) + 43;
           let x2 = 512*(180+(points[point2].lng - center.lng()%360) * zoomFactor)/360 + 244;
 
+          // add newly created line to shape array
           this.lines = [...this.lines,
             { 
               "x1": x1,   
