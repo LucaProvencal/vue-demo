@@ -22,8 +22,7 @@
     <p>
 		- When switching between layers, the layer being switched to does not update until it is zoomed or dragged. <br/>
 		This can be fixed by looping through all layers and redrawing each of their lines when the map is zoomed or dragged.<br/><br/>
-		- When dragging the map, The Google Maps API uses a form of "momentum" to slow the map down after the user releases a <br/>click. The latitude and longitude are calculated as soon as the user lets go of a click, which triggers the overlayed shape <br/> to snap to position. In this case, the rendered SVG does not follow the map's momentum.<br/><br/>
-		- Map does not load initially. Requires switching between About and Home tabs.
+		- When dragging the map, The Google Maps API uses a form of "momentum" to slow the map down after the user releases a <br/>click. The latitude and longitude are calculated as soon as the user lets go of a click, which triggers the overlayed shape <br/> to snap to position. In this case, the rendered SVG does not follow the map's momentum.
 		<br/>
 	</p>
 
